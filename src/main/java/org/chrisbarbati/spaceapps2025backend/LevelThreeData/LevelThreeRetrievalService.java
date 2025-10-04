@@ -11,6 +11,7 @@ import ucar.nc2.Variable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ public class LevelThreeRetrievalService {
     //Logging
     private static final Logger logger = LoggerFactory.getLogger(LevelThreeRetrievalService.class);
 
-    public void retrieve() {
+    public byte[] retrieve(float lat1, float lat2, float lon1, float lon2) {
         logger.info("Retrieving Level Three Data");
 
         //TODO: Retrieve the data here, for now just get it from filesystem
@@ -61,13 +62,6 @@ public class LevelThreeRetrievalService {
 
             logger.debug("Shape: {} ", Arrays.toString(data.getShape()));
 
-            // Get the data in some range (TODO: pass as args later)
-            float lat1 = 30;
-            float lat2 = 45;
-
-            float lon1 = -90;
-            float lon2 = -75;
-
             logger.debug("Getting data in latitude range {} to {} and longitude range {} to {}", lat1, lat2, lon1, lon2);
 
             double min = 0;
@@ -103,7 +97,7 @@ public class LevelThreeRetrievalService {
                     double no2Value = data.getDouble(idx.set(0, i, j));
 
                     // Account for the minimum value
-                    if (no2Value == -1E30){
+                    if (no2Value == -1E30) {
                         no2Value = 0;
                     }
 
@@ -127,7 +121,13 @@ public class LevelThreeRetrievalService {
 
             logger.debug("Buffered image generated at: {}ms", System.currentTimeMillis() - start);
 
-            ImageIO.write(bufferedImage, "png", new File("output.png"));
+            byte[] imageBytes;
+
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                ImageIO.write(bufferedImage, "png", baos);
+                baos.flush();
+                imageBytes = baos.toByteArray();
+            }
 
             logger.debug("Image written to file at: {}ms", System.currentTimeMillis() - start);
 
@@ -135,9 +135,13 @@ public class LevelThreeRetrievalService {
 
             logger.debug("Time taken: {} ms", end - start);
 
+            logger.trace("Finished retrieving data");
+            return imageBytes;
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
+        // TODO: Handle better
+        return null;
+    }
 }
