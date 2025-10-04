@@ -71,7 +71,7 @@ public class LevelThreeRetrievalService {
 
             logger.debug("Getting data in latitude range {} to {} and longitude range {} to {}", lat1, lat2, lon1, lon2);
 
-            double min = 0;
+            double min = Double.MAX_VALUE;
             double max = Double.NEGATIVE_INFINITY;
 
             Index idx = data.getIndex();
@@ -82,6 +82,9 @@ public class LevelThreeRetrievalService {
                     for (int j = 0; j < lons.length; j++) {
                         if (lons[j] >= lon1 && lons[j] <= lon2) {
                             double v = data.getDouble(idx.set(0, i, j));
+                            if (v != -1E30 && v < min) {
+                                min = v;
+                            }
                             if (v != -1E30 && v > max) {
                                 max = v;
                             }
@@ -90,8 +93,9 @@ public class LevelThreeRetrievalService {
                 }
             }
 
+            logger.debug("Min value found: {}", min);
             logger.debug("Max value found: {}", max);
-            logger.debug("Max value retrieved at: {} ms", System.currentTimeMillis() - start);
+            logger.debug("Min and max values retrieved at: {} ms", System.currentTimeMillis() - start);
 
             // 2. Build image: width = lon range, height = lat range
             int height = lats.length;
@@ -105,21 +109,30 @@ public class LevelThreeRetrievalService {
 
                     // Handle missing or invalid values
                     if (no2Value == -1E30) {
-                        no2Value = 0;
+                        int argb = 0;
+
+                        bufferedImage.setRGB(j, height - 1 - i, argb); // flip vertically
+                        continue;
                     }
 
-                    double normalized = no2Value / max;
+                    // Normalize data relative the min and max values
+                    double normalized = (no2Value - min) / (max - min);
+
                     if (normalized < 0) normalized = 0;
                     if (normalized > 1) normalized = 1;
 
                     // 50% opacity
                     int alpha = 128;
 
-                    // Gradient from green (low) to red (high)
-                    // Green: (0,255,0), Red: (255,0,0)
-                    int red = (int) (255 * normalized);
-                    int green = (int) (255 * (1 - normalized));
-                    int blue = 0;
+                    int red, green, blue = 0;
+
+                    if (normalized < 0.5) {
+                        red = (int) (normalized * 2 * 255);
+                        green = 255;
+                    } else {
+                        red = 255;
+                        green = (int) ((1 - (normalized - 0.5) * 2) * 255);
+                    }
 
                     int rgb = (red << 16) | (green << 8) | blue;
                     int argb = (alpha << 24) | rgb;
