@@ -45,12 +45,25 @@ public class LevelThreeRetrievalService {
 
             logger.debug("Shape: {} ", Arrays.toString(data.getShape()));
 
-            // First test, print to console
+            // Second test, get the data in some range of latitudes and longitudes
+            float lat1 = 30;
+            float lat2 = 45;
+
+            float lon1 = -90;
+            float lon2 = -75;
+
+            logger.debug("Getting data in latitude range {} to {} and longitude range {} to {}", lat1, lat2, lon1, lon2);
+
+            // Find the values in the lat and lon arrays within the bounding box defined by lat1, lat2, lon1, lon2
             Index idx = data.getIndex();
-            for (int i = 0; i < lats.length; i++) {
-                for (int j = 0; j < lons.length; j++) {
-                    double no2value = data.getDouble(idx.set(0, i, j));
-                    logger.debug(String.format("%.6f,%.6f,%.6f%n", lats[i], lons[j], no2value));
+            for(int i = 0; i < lats.length; i++) {
+                if(lats[i] >= lat1 && lats[i] <= lat2) {
+                    for(int j = 0; j < lons.length; j++) {
+                        if(lons[j] >= lon1 && lons[j] <= lon2){
+                            double no2value = data.getDouble(idx.set(0, i, j));
+                            logger.debug(String.format("%.6f,%.6f,%.6f%n", lats[i], lons[j], no2value));
+                        }
+                    }
                 }
             }
 
