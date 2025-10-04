@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Tempo NC files
+/src/main/resources/tempoData/*.nc
