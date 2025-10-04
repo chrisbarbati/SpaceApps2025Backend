@@ -1,7 +1,6 @@
-package org.chrisbarbati.spaceapps2025backend.LevelThreeData;
+package org.chrisbarbati.spaceapps2025backend.levelthreedata;
 
 import java.time.Instant;
-import java.util.Date;
 
 public record LevelThreeDataResponse(
         Instant generatedAtInstant,
