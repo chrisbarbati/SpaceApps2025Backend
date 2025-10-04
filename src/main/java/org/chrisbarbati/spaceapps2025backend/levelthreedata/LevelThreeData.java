@@ -1,4 +1,4 @@
 package org.chrisbarbati.spaceapps2025backend.levelthreedata;
 
-public record LevelThreeData(double minNO2, double maxNO2, String imageBase64) {
+public record LevelThreeData(double minNO2, double maxNO2, double centerNO2, String imageBase64) {
 }

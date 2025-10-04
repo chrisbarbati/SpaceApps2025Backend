@@ -42,6 +42,7 @@ public class LevelThreeRestController {
                 lon2,
                 levelThreeData.minNO2(),
                 levelThreeData.maxNO2(),
+                levelThreeData.centerNO2(),
                 levelThreeData.imageBase64()
         );
 

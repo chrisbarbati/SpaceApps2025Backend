@@ -10,6 +10,7 @@ public record LevelThreeDataResponse(
         Float lon2,
         Double minNO2,
         Double maxNO2,
+        Double centerNO2,
         String imagePng
 ) {
 }
