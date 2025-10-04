@@ -1,6 +1,7 @@
 package org.chrisbarbati.spaceapps2025backend.levelthreedata;
 
 import org.slf4j.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ucar.ma2.Array;
 import ucar.ma2.Index;
@@ -22,14 +23,20 @@ public class LevelThreeRetrievalService {
     //Logging
     private static final Logger logger = LoggerFactory.getLogger(LevelThreeRetrievalService.class);
 
+    // Injected Dependencies
+    private final String fileName;
+
+    public LevelThreeRetrievalService(@Value("${tempo.file.path}") String fileName) {
+        this.fileName = fileName;
+    }
+
     public LevelThreeData retrieve(float lat1, float lat2, float lon1, float lon2) {
         logger.info("Retrieving Level Three Data");
 
         //TODO: Retrieve the data here, for now just get it from filesystem
-        String filename = "src/main/resources/tempoData/TEMPO_NO2_L3_V04_20251004T125055Z_S003.nc";
-        logger.debug("Reading file: {}", filename);
+        logger.debug("Reading file: {}", fileName);
 
-        try (NetcdfFile ncFile = NetcdfFiles.open(filename)) {
+        try (NetcdfFile ncFile = NetcdfFiles.open(fileName)) {
             logger.trace("Finished opening file");
 
             //Log structure of file to console.
@@ -96,25 +103,27 @@ public class LevelThreeRetrievalService {
                 for (int j = 0; j < width; j++) {
                     double no2Value = data.getDouble(idx.set(0, i, j));
 
-                    // Account for the minimum value
+                    // Handle missing or invalid values
                     if (no2Value == -1E30) {
                         no2Value = 0;
                     }
 
-                    // Calculate the opacity between 0 and 255 based on v / max
-                    int alpha = (int) Math.round(255 * (no2Value / max));  // 0..255
+                    double normalized = no2Value / max;
+                    if (normalized < 0) normalized = 0;
+                    if (normalized > 1) normalized = 1;
 
-                    // Account for any values that fall outside the range
-                    if (alpha < 0) alpha = 0;
-                    if (alpha > 255) alpha = 255;
+                    // 50% opacity
+                    int alpha = 128;
 
-                    // Create a pure white RGB pixel
-                    int rgb = (255 << 16) | (255 << 8) | 255;
+                    // Gradient from green (low) to red (high)
+                    // Green: (0,255,0), Red: (255,0,0)
+                    int red = (int) (255 * normalized);
+                    int green = (int) (255 * (1 - normalized));
+                    int blue = 0;
 
-                    // Add the opacity
+                    int rgb = (red << 16) | (green << 8) | blue;
                     int argb = (alpha << 24) | rgb;
 
-                    // Set the value of the corresponding pixel
                     bufferedImage.setRGB(j, height - 1 - i, argb); // flip vertically
                 }
             }
