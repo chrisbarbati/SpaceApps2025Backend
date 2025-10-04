@@ -11,6 +11,6 @@ public record LevelThreeDataResponse(
         Float lon2,
         Double minNO2,
         Double maxNO2,
-        byte[] imagePng
+        String imagePng
 ) {
 }

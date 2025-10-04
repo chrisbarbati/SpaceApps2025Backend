@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Base64;
 
 @Service
 public class LevelThreeRetrievalService {
@@ -26,7 +27,7 @@ public class LevelThreeRetrievalService {
         logger.info("Retrieving Level Three Data");
 
         //TODO: Retrieve the data here, for now just get it from filesystem
-        String filename = "src/main/resources/tempoData/TEMPO_NO2_L3_V04_20251003T231130Z_S014.nc";
+        String filename = "src/main/resources/tempoData/TEMPO_NO2_L3_V04_20251004T125055Z_S003.nc";
         logger.debug("Reading file: {}", filename);
 
         try (NetcdfFile ncFile = NetcdfFiles.open(filename)) {
@@ -131,12 +132,15 @@ public class LevelThreeRetrievalService {
 
             logger.debug("Image written to stream at: {}ms", System.currentTimeMillis() - start);
 
+            // Encode to base64
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
             long end = System.currentTimeMillis();
 
             logger.debug("Time taken: {} ms", end - start);
 
             logger.trace("Finished retrieving data");
-            return new LevelThreeData(min, max, imageBytes);
+            return new LevelThreeData(min, max, base64Image);
         } catch (IOException e) {
             e.printStackTrace();
         }

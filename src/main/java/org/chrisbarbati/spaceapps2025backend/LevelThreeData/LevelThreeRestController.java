@@ -44,8 +44,8 @@ public class LevelThreeRestController {
                 lon1,
                 lon2,
                 levelThreeData.minNO2(),
-                levelThreeData.minNO2(),
-                levelThreeData.imageBytes()
+                levelThreeData.maxNO2(),
+                levelThreeData.imageBase64()
         );
 
         return ResponseEntity.ok(levelThreeDataResponse);
