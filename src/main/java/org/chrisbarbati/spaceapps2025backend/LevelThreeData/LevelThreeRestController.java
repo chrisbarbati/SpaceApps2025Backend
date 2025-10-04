@@ -35,17 +35,19 @@ public class LevelThreeRestController {
         float lon1 = -90;
         float lon2 = -75;
 
-        byte[] imageData = levelThreeRetrievalService.retrieve(lat1, lat2, lon1, lon2);
+        LevelThreeData levelThreeData = levelThreeRetrievalService.retrieve(lat1, lat2, lon1, lon2);
 
-        LevelThreeDataResponse response = new LevelThreeDataResponse(
+        LevelThreeDataResponse levelThreeDataResponse = new LevelThreeDataResponse(
             Instant.now(),
                 lat1,
                 lat2,
                 lon1,
                 lon2,
-                imageData
+                levelThreeData.minNO2(),
+                levelThreeData.minNO2(),
+                levelThreeData.imageBytes()
         );
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(levelThreeDataResponse);
     }
 }

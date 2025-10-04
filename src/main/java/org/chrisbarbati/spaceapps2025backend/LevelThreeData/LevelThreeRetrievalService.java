@@ -22,7 +22,7 @@ public class LevelThreeRetrievalService {
     //Logging
     private static final Logger logger = LoggerFactory.getLogger(LevelThreeRetrievalService.class);
 
-    public byte[] retrieve(float lat1, float lat2, float lon1, float lon2) {
+    public LevelThreeData retrieve(float lat1, float lat2, float lon1, float lon2) {
         logger.info("Retrieving Level Three Data");
 
         //TODO: Retrieve the data here, for now just get it from filesystem
@@ -129,14 +129,14 @@ public class LevelThreeRetrievalService {
                 imageBytes = baos.toByteArray();
             }
 
-            logger.debug("Image written to file at: {}ms", System.currentTimeMillis() - start);
+            logger.debug("Image written to stream at: {}ms", System.currentTimeMillis() - start);
 
             long end = System.currentTimeMillis();
 
             logger.debug("Time taken: {} ms", end - start);
 
             logger.trace("Finished retrieving data");
-            return imageBytes;
+            return new LevelThreeData(min, max, imageBytes);
         } catch (IOException e) {
             e.printStackTrace();
         }

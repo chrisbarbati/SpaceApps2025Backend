@@ -9,6 +9,8 @@ public record LevelThreeDataResponse(
         Float lat2,
         Float lon1,
         Float lon2,
+        Double minNO2,
+        Double maxNO2,
         byte[] imagePng
 ) {
 }
