@@ -76,11 +76,31 @@ public class LevelThreeRetrievalService {
 
             Index idx = data.getIndex();
 
+            int latsInRange = 0;
+            int lonsInRange = 0;
+
+            int firstLatInRangeIdx = -1;
+            int firstLonInRangeIdx = -1;
+
             // 1. Find max value inside bounding box
             for (int i = 0; i < lats.length; i++) {
                 if (lats[i] >= lat1 && lats[i] <= lat2) {
+
+                    if(firstLatInRangeIdx == -1){
+                        firstLatInRangeIdx = i;
+                    }
+
+                    latsInRange++;
+
                     for (int j = 0; j < lons.length; j++) {
                         if (lons[j] >= lon1 && lons[j] <= lon2) {
+
+                            if(firstLonInRangeIdx == -1){
+                                firstLonInRangeIdx = j;
+                            }
+
+                            lonsInRange++;
+
                             double v = data.getDouble(idx.set(0, i, j));
                             if (v != -1E30 && v < min) {
                                 min = v;
@@ -93,25 +113,34 @@ public class LevelThreeRetrievalService {
                 }
             }
 
+            lonsInRange/=latsInRange;
+
             logger.debug("Min value found: {}", min);
             logger.debug("Max value found: {}", max);
             logger.debug("Min and max values retrieved at: {} ms", System.currentTimeMillis() - start);
 
+            logger.debug("Total lat values: {}", lats.length);
+            logger.debug("First lat in range at index: {}", firstLatInRangeIdx);
+            logger.debug("Lat values in range: {}", latsInRange);
+            logger.debug("Total lon values: {}", lons.length);
+            logger.debug("First lon in range at index: {}", firstLonInRangeIdx);
+            logger.debug("Lon values in range: {}", lonsInRange);
+
             // 2. Build image: width = lon range, height = lat range
-            int height = lats.length;
-            int width = lons.length;
+            int height = latsInRange;
+            int width = lonsInRange;
             BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
             // 3. Fill image
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
+            for (int i = firstLatInRangeIdx; i < (height + firstLatInRangeIdx); i++) {
+                for (int j = firstLonInRangeIdx; j < (width + firstLonInRangeIdx); j++) {
                     double no2Value = data.getDouble(idx.set(0, i, j));
 
                     // Handle missing or invalid values
                     if (no2Value == -1E30) {
                         int argb = 0;
 
-                        bufferedImage.setRGB(j, height - 1 - i, argb); // flip vertically
+                        bufferedImage.setRGB(j - firstLonInRangeIdx, i - firstLatInRangeIdx, argb); // flip vertically
                         continue;
                     }
 
@@ -137,7 +166,8 @@ public class LevelThreeRetrievalService {
                     int rgb = (red << 16) | (green << 8) | blue;
                     int argb = (alpha << 24) | rgb;
 
-                    bufferedImage.setRGB(j, height - 1 - i, argb); // flip vertically
+                    logger.debug("Setting coordinate at {}, {}", j - firstLonInRangeIdx, i - firstLatInRangeIdx);
+                    bufferedImage.setRGB(j - firstLonInRangeIdx, i - firstLatInRangeIdx, argb); // flip vertically
                 }
             }
 

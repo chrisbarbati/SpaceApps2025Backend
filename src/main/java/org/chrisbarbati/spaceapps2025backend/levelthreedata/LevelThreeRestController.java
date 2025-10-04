@@ -4,6 +4,7 @@ import org.slf4j.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
@@ -23,15 +24,13 @@ public class LevelThreeRestController {
     }
 
     @GetMapping("/retrieve")
-    public ResponseEntity<LevelThreeDataResponse> retrieve() {
+    public ResponseEntity<LevelThreeDataResponse> retrieve(
+            @RequestParam("lat1") float lat1,
+            @RequestParam("lat2") float lat2,
+            @RequestParam("lon1") float lon1,
+            @RequestParam("lon2") float lon2
+    ) {
         logger.info("Retrieving Level Three Data");
-
-        // Get the data in some range (TODO: pass as args later)
-        float lat1 = 30;
-        float lat2 = 45;
-
-        float lon1 = -90;
-        float lon2 = -75;
 
         LevelThreeData levelThreeData = levelThreeRetrievalService.retrieve(lat1, lat2, lon1, lon2);
 
