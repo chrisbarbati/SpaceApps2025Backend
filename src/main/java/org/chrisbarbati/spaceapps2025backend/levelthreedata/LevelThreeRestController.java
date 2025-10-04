@@ -1,4 +1,4 @@
-package org.chrisbarbati.spaceapps2025backend.LevelThreeData;
+package org.chrisbarbati.spaceapps2025backend.levelthreedata;
 
 import org.slf4j.*;
 import org.springframework.http.ResponseEntity;
@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.logging.Level;
 
 @RestController
 @RequestMapping("/api/level-three")
@@ -44,7 +42,7 @@ public class LevelThreeRestController {
                 lon1,
                 lon2,
                 levelThreeData.minNO2(),
-                levelThreeData.minNO2(),
+                levelThreeData.maxNO2(),
                 levelThreeData.imageBytes()
         );
 

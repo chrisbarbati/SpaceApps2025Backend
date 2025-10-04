@@ -1,4 +1,4 @@
-package org.chrisbarbati.spaceapps2025backend.LevelThreeData;
+package org.chrisbarbati.spaceapps2025backend.levelthreedata;
 
 import org.slf4j.*;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,6 @@ import ucar.nc2.Variable;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
