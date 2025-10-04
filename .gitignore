@@ -34,3 +34,4 @@ build/
 
 # Tempo NC files
 /src/main/resources/tempoData/*.nc
+*.png
