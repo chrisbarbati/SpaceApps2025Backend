@@ -85,9 +85,9 @@ public class LevelThreeRetrievalService {
                 return levelThreeData;
             }
 
-            logger.debug("Reading file: {}", tempoFiles.get(n));
+            logger.debug("Reading file: {}", tempoFiles.get(i));
 
-            try (NetcdfFile ncFile = NetcdfFiles.open(tempoFiles.get(n))) {
+            try (NetcdfFile ncFile = NetcdfFiles.open(tempoFiles.get(i))) {
                 levelThreeData.add(getLevelThreeData(ncFile, lat1, lat2, lon1, lon2));
             } catch (IOException e) {
                 logger.error("IO Exception when attempting to retrieve LevelThreeData from tempo files: {}", e.getMessage());
