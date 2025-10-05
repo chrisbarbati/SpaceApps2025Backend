@@ -1,5 +1,6 @@
 package org.chrisbarbati.spaceapps2025backend.levelthreedata;
 
+import org.chrisbarbati.spaceapps2025backend.PythonScheduler;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,12 @@ public class LevelThreeRetrievalService {
     private static final Logger logger = LoggerFactory.getLogger(LevelThreeRetrievalService.class);
 
     private static final Pattern DATE_PATTERN = Pattern.compile("_(\\d{8}T\\d{6})Z_");
+
+    private final PythonScheduler pythonScheduler;
+
+    public LevelThreeRetrievalService(PythonScheduler pythonScheduler) {
+        this.pythonScheduler = pythonScheduler;
+    }
 
     public LevelThreeData retrieveLatest(float lat1, float lat2, float lon1, float lon2) {
         logger.info("Retrieving Level Three Data");
@@ -87,7 +94,7 @@ public class LevelThreeRetrievalService {
 
             logger.debug("Reading file: {}", tempoFiles.get(n));
 
-            try (NetcdfFile ncFile = NetcdfFiles.open(tempoFiles.get(n))) {
+            try (NetcdfFile ncFile = NetcdfFiles.open(tempoFiles.get(i))) {
                 levelThreeData.add(getLevelThreeData(ncFile, lat1, lat2, lon1, lon2));
             } catch (IOException e) {
                 logger.error("IO Exception when attempting to retrieve LevelThreeData from tempo files: {}", e.getMessage());
@@ -98,8 +105,10 @@ public class LevelThreeRetrievalService {
         return levelThreeData;
     }
 
-    private static List<String> getTempoFiles() throws IOException {
-        Path dir = Paths.get("src/main/resources/tempoData/NO2_L3");
+    private List<String> getTempoFiles() throws IOException {
+        Path dir = pythonScheduler.getPythonScriptPath().getParent().resolve("tempo_data");
+        logger.debug("Tempo data directory: {}", dir);
+        //Path dir = Paths.get("src/main/resources/tempoData/NO2_L3");
 
         return Files.list(dir)
                 .filter(Files::isRegularFile)
