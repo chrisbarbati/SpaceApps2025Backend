@@ -33,7 +33,7 @@ build/
 .vscode/
 
 # Tempo NC files
-/src/main/resources/tempoData/*.nc
+*.nc
 *.png
 
 # Sensitive properties

@@ -14,8 +14,16 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class LevelThreeRetrievalService {
@@ -25,6 +33,7 @@ public class LevelThreeRetrievalService {
 
     // Injected Dependencies
     private final String fileName;
+    private static final Pattern DATE_PATTERN = Pattern.compile("_(\\d{8}T\\d{6})Z_");
 
     public LevelThreeRetrievalService(@Value("${tempo.file.path}") String fileName) {
         this.fileName = fileName;
@@ -33,11 +42,14 @@ public class LevelThreeRetrievalService {
     public LevelThreeData retrieve(float lat1, float lat2, float lon1, float lon2) {
         logger.info("Retrieving Level Three Data");
 
+
         //TODO: Retrieve the data here, for now just get it from filesystem
         logger.debug("Reading file: {}", fileName);
 
         try (NetcdfFile ncFile = NetcdfFiles.open(fileName)) {
             logger.trace("Finished opening file");
+
+            logger.debug("Tempo files: {}", getTempoFiles());
 
             //Log structure of file to console.
             //TODO: Remove / disable in prod to reduce latency
@@ -220,4 +232,22 @@ public class LevelThreeRetrievalService {
         // TODO: Handle better
         return null;
     }
+
+    private static List<String> getTempoFiles() throws IOException {
+        Path dir = Paths.get("src/main/resources/tempoData/NO2_L3");
+
+        return Files.list(dir)
+                .filter(Files::isRegularFile)
+                .map(Path::toString)
+                .filter(name -> name.endsWith(".nc"))
+                .sorted(Comparator.comparing(LevelThreeRetrievalService::extractDateString))
+                .collect(Collectors.toList());
+    }
+
+
+    private static String extractDateString(String path) {
+        Matcher m = DATE_PATTERN.matcher(path);
+        return m.find() ? m.group(1) : "";
+    }
+
 }
