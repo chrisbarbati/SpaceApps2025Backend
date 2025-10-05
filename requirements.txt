@@ -1,0 +1,5 @@
+earthaccess
+xarray
+pandas
+python-dotenv
+h5netcdf
