@@ -92,7 +92,7 @@ public class LevelThreeRetrievalService {
                 return levelThreeData;
             }
 
-            logger.debug("Reading file: {}", tempoFiles.get(n));
+            logger.debug("Reading file: {}", tempoFiles.get(i));
 
             try (NetcdfFile ncFile = NetcdfFiles.open(tempoFiles.get(i))) {
                 levelThreeData.add(getLevelThreeData(ncFile, lat1, lat2, lon1, lon2));
