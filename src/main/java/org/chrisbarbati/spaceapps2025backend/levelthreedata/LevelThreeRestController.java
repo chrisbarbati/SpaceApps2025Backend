@@ -35,20 +35,9 @@ public class LevelThreeRestController {
         logger.info("Retrieving Level Three Data");
 
         LevelThreeData levelThreeData = levelThreeRetrievalService.retrieveLatest(lat1, lat2, lon1, lon2);
+        LevelThreeDataResponse response = mapToDataResponse(levelThreeData, lat1, lat2, lon1, lon2);
 
-        LevelThreeDataResponse levelThreeDataResponse = new LevelThreeDataResponse(
-            Instant.now(),
-                lat1,
-                lat2,
-                lon1,
-                lon2,
-                levelThreeData.minNO2(),
-                levelThreeData.maxNO2(),
-                levelThreeData.centerNO2(),
-                levelThreeData.imageBase64()
-        );
-
-        return ResponseEntity.ok(levelThreeDataResponse);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/retrieveN")
@@ -62,26 +51,73 @@ public class LevelThreeRestController {
         logger.info("Retrieving Level Three Data");
 
         List<LevelThreeData> levelThreeDataList = levelThreeRetrievalService.retrieveNLatest(lat1, lat2, lon1, lon2, n);
+        List<LevelThreeDataResponse> responseList = mapToDataResponseList(levelThreeDataList, lat1, lat2, lon1, lon2);
 
-        List<LevelThreeDataResponse> levelThreeDataResponseList = new ArrayList<>();
+        return ResponseEntity.ok(responseList);
+    }
 
-        for(LevelThreeData levelThreeData : levelThreeDataList) {
-            LevelThreeDataResponse levelThreeDataResponse = new LevelThreeDataResponse(
-                    Instant.now(),
-                    lat1,
-                    lat2,
-                    lon1,
-                    lon2,
-                    levelThreeData.minNO2(),
-                    levelThreeData.maxNO2(),
-                    levelThreeData.centerNO2(),
-                    levelThreeData.imageBase64()
-            );
+    @GetMapping("/retrieveFull")
+    public ResponseEntity<LevelThreeFullDataResponse> retrieveFull(
+            @RequestParam(value = "scaleFactor", defaultValue = "10") int scaleFactor
+    ) {
+        logger.info("Retrieving full Level Three Data with scale factor {}", scaleFactor);
 
-            levelThreeDataResponseList.add(levelThreeDataResponse);
+        LevelThreeData levelThreeData = levelThreeRetrievalService.retrieveLatestFullDownscaled(scaleFactor);
+        LevelThreeFullDataResponse response = mapToFullDataResponse(levelThreeData, scaleFactor);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/retrieveNFull")
+    public ResponseEntity<List<LevelThreeFullDataResponse>> retrieveNFull(
+            @RequestParam("n") int n,
+            @RequestParam(value = "scaleFactor", defaultValue = "10") int scaleFactor
+    ) {
+        logger.info("Retrieving {} samples of full Level Three Data with scale factor {}", n, scaleFactor);
+
+        List<LevelThreeData> levelThreeDataList = levelThreeRetrievalService.retrieveNLatestFullDownscaled(n, scaleFactor);
+        List<LevelThreeFullDataResponse> responseList = mapToFullDataResponseList(levelThreeDataList, scaleFactor);
+
+        return ResponseEntity.ok(responseList);
+    }
+
+    private LevelThreeDataResponse mapToDataResponse(LevelThreeData data, float lat1, float lat2, float lon1, float lon2) {
+        return new LevelThreeDataResponse(
+                Instant.now(),
+                lat1,
+                lat2,
+                lon1,
+                lon2,
+                data.minNO2(),
+                data.maxNO2(),
+                data.centerNO2(),
+                data.imageBase64()
+        );
+    }
+
+    private List<LevelThreeDataResponse> mapToDataResponseList(List<LevelThreeData> dataList, float lat1, float lat2, float lon1, float lon2) {
+        List<LevelThreeDataResponse> responseList = new ArrayList<>();
+        for (LevelThreeData data : dataList) {
+            responseList.add(mapToDataResponse(data, lat1, lat2, lon1, lon2));
         }
+        return responseList;
+    }
 
+    private LevelThreeFullDataResponse mapToFullDataResponse(LevelThreeData data, int scaleFactor) {
+        return new LevelThreeFullDataResponse(
+                Instant.now(),
+                scaleFactor,
+                data.minNO2(),
+                data.maxNO2(),
+                data.imageBase64()
+        );
+    }
 
-        return ResponseEntity.ok(levelThreeDataResponseList);
+    private List<LevelThreeFullDataResponse> mapToFullDataResponseList(List<LevelThreeData> dataList, int scaleFactor) {
+        List<LevelThreeFullDataResponse> responseList = new ArrayList<>();
+        for (LevelThreeData data : dataList) {
+            responseList.add(mapToFullDataResponse(data, scaleFactor));
+        }
+        return responseList;
     }
 }
