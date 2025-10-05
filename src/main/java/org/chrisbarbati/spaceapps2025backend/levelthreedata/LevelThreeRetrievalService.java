@@ -127,7 +127,7 @@ public class LevelThreeRetrievalService {
         long start = System.currentTimeMillis();
 
         // Read the whole 3D variable for the NO2 data (very large dataset - need a subset)
-        Variable prodVar = ncFile.findVariable("support_data/vertical_column_total");
+        Variable prodVar = ncFile.findVariable("vertical_column_total");
         Array data = prodVar.read();
 
         //logger.debug("Shape: {} ", Arrays.toString(data.getShape()));
