@@ -34,5 +34,15 @@ public class GroundBasedAirQualityRestController {
         return ResponseEntity.ok(airQualityResponse);
     }
 
+    @GetMapping("/retrieveForecast")
+    public ResponseEntity<AirQualityResponse> retrieveForecast(
+            @RequestParam("lat") float lat,
+            @RequestParam("lon") float lon
+    ){
+
+        AirQualityResponse airQualityResponse = groundBasedAirQualityService.getAirQualityForecast(lat, lon);
+
+        return ResponseEntity.ok(airQualityResponse);
+    }
 
 }

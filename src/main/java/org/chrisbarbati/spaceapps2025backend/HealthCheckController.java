@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HealthCheckController {
 
-    //Logging
-    private static final Logger logger = LoggerFactory.getLogger(HealthCheckController.class);
-
     @GetMapping("/")
     public ResponseEntity<Void> root() {
         // Returns 200 OK with no body

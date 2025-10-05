@@ -4,7 +4,10 @@ import org.chrisbarbati.spaceapps2025backend.groundbased.GroundBasedAirQualityRe
 import org.chrisbarbati.spaceapps2025backend.groundbased.apiresponse.AirQualityResponse;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -38,4 +41,19 @@ public class GroundBasedAirQualityService {
         return restTemplate.getForObject(urlStringBuilder.toString(), AirQualityResponse.class);
 
     }
+
+    public AirQualityResponse getAirQualityForecast(double lat, double lon) {
+
+        StringBuilder urlStringBuilder = new StringBuilder("http://api.openweathermap.org/data/2.5/air_pollution/forecast")
+                .append("?lat=")
+                .append(lat)
+                .append("&lon=")
+                .append(lon)
+                .append("&appid=")
+                .append(apiKey);
+
+        return restTemplate.getForObject(urlStringBuilder.toString(), AirQualityResponse.class);
+
+    }
+
 }
