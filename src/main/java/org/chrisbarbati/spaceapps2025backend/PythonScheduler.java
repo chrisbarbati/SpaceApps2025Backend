@@ -1,6 +1,5 @@
 package org.chrisbarbati.spaceapps2025backend;
 
-import jakarta.annotation.PostConstruct;
 import org.slf4j.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.Scheduled;

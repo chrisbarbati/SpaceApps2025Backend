@@ -1,14 +1,17 @@
 package org.chrisbarbati.spaceapps2025backend.groundbased.service;
 
-import org.chrisbarbati.spaceapps2025backend.groundbased.GroundBasedAirQualityRestController;
 import org.chrisbarbati.spaceapps2025backend.groundbased.apiresponse.AirQualityResponse;
+import org.chrisbarbati.spaceapps2025backend.groundbased.apiresponse.AirQualityEntry;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GroundBasedAirQualityService {
@@ -52,8 +55,25 @@ public class GroundBasedAirQualityService {
                 .append("&appid=")
                 .append(apiKey);
 
-        return restTemplate.getForObject(urlStringBuilder.toString(), AirQualityResponse.class);
+        AirQualityResponse response = restTemplate.getForObject(urlStringBuilder.toString(), AirQualityResponse.class);
 
+        // Filter to only include entries at 12pm (noon) for 5 days
+        if (response != null && response.getList() != null) {
+            List<AirQualityEntry> filteredList = response.getList().stream()
+                    .filter(entry -> {
+                        // Convert Unix timestamp to ZonedDateTime
+                        ZonedDateTime dateTime = Instant.ofEpochSecond(entry.getDt())
+                                .atZone(ZoneId.of("UTC"));
+                        // Filter for entries at 12pm (noon)
+                        return dateTime.getHour() == 12;
+                    })
+                    .limit(5) // Limit to 5 days
+                    .collect(Collectors.toList());
+
+            response.setList(filteredList);
+        }
+
+        return response;
     }
 
 }

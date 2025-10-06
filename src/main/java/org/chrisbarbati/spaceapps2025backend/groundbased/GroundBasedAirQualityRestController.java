@@ -1,6 +1,5 @@
 package org.chrisbarbati.spaceapps2025backend.groundbased;
 
-import org.chrisbarbati.spaceapps2025backend.groundbased.apiresponse.AirQualityEntry;
 import org.chrisbarbati.spaceapps2025backend.groundbased.apiresponse.AirQualityResponse;
 import org.chrisbarbati.spaceapps2025backend.groundbased.service.GroundBasedAirQualityService;
 import org.slf4j.*;
